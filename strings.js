@@ -24,22 +24,23 @@ const stringTasks = {
     return arr.join('');
   },
 
-  /** 777
+  /** 777+
    * на вход подается строка в camelCase
    * вернуть строку в snake_case
    * 'camelCaseString' => 'camel_case_string'
    */
   camelToSnake(srcStr) { 
-    let str ='';
-    
+  
+    const arr = [];
     for ( let i = 0; i < srcStr.length; i++ ) {
-     if (srcStr[i].toUpperCase() ===  srcStr[i]) {
-        str = str + '_' + srcStr[i].toLowerCase();
+     if (srcStr[i].toUpperCase() === srcStr[i]) {
+      arr.push('_');
+      arr.push(srcStr[i].toLowerCase());
      } else {
-       str += srcStr[i];
+      arr.push(srcStr[i]);
      } 
     }
-    return str;
+    return arr.join('');
   },
 
   /**
@@ -51,7 +52,7 @@ const stringTasks = {
   capitalizeWords: function (str) {
 
   },
-  /* 777  на входе строка @srcString, в которой слова разделены пробелами, и ch - символ, из которого будем "рисовать" рамку
+  /* 777+  на входе строка @srcString, в которой слова разделены пробелами, и ch - символ, из которого будем "рисовать" рамку
     вывести строку на консоль, так что-бы каждое слово было в новой строке а весь вывод был в текстовой псевдорамке
     например
     printInFrame('This string will be printed in frame', '*');
@@ -75,20 +76,13 @@ const stringTasks = {
         }
       }
 
-      function lineCh(ch) {
-        let line='';
-        for ( let j = 1; j < maxLength + 5; j++ ) {
-          line += ch;
-        }
-        console.log(line);
-      }
-
+       lineCh = (ch) => {
+         console.log(ch.repeat(maxLength + 4))
+       }
+        
       lineCh(ch);
       for (let i = 0; i < arr.length; i++ ) {
-        let backLine = '';
-        for ( let j = 0; j < (maxLength - arr[i].length); j++ ) { 
-          backLine += ' ';
-        }
+        let backLine = ' '.repeat(maxLength - arr[i].length);
         console.log('* ' + arr[i] + backLine + ' *');
       }
       lineCh(ch);
@@ -116,13 +110,10 @@ const stringTasks = {
    */
   reverseNumber: function (n) {
     let num = 0;
-    if ( n < 0 ) {
-      num = n * (-1);
-      num = reverseString(num.toString());
-      num = num * (-1);
-    } else {
-      num = reverseString(n.toString());
-    }
+    const sign = n < 0 ? -1: 1;
+         num = n * (sign);
+         num = reverseString(num.toString());
+         num = num * (sign);
     return +num;
   },
   /**

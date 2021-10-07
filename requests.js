@@ -11,7 +11,7 @@ const requests = {
    * если всё выполнилось хорошо, тогда надо вызвать cb(null, response) если была ошибка - cb(error)
    * */
   httpGet(url, params, options, cb) {
-      const fullUrl = url + encodeURIComponent('?')
+      const fullUrl = url + '?'
            + objectToQuery(params);
           
       let x = new XMLHttpRequest();
@@ -30,12 +30,25 @@ const requests = {
    * смотреть описание httpGet
    * метод будет делать почти то же самое только данные будут отправляться через POST
    */
-  httpPost(url, params, options, cb) {
-    const body = objectToQuery(params);
+  httpPost(url, urlParams, params, options, headers, timeout, sync, cb) {
+    const fullUrl = url + '?'
+           + objectToQuery(urlParams);
+    const body = JSON.stringify(params);
           
       let x = new XMLHttpRequest();
-          x.open("POST", url, options);
+          x.open("POST", fullUrl, !sync, options);
           x.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+//set headers // headers = {...}
+          Object.entries(headers).forEach(([key, value]) => {
+            x.setRequestHeader(`'${key}', '${value}'`);
+          })
+
+//timeout
+          x.timeout = timeout;
+          x.ontimeout = () => {
+            console.log('Загрузка прервана - превышено время ожидания ответа сервера');
+          };
+
           x.send(body);
           x.onload = () => {
             let data = x.response;
@@ -46,30 +59,25 @@ const requests = {
           };                  
    },
 
-  /**
+  /**+
    * ф-ция на вход получает объект {key1: value1, key2: value2,.... } и возваращет строку в виде key1=value1&key2=value2....
    */
   objectToQuery(obj) {
-      let param = '';
-        for ( let key in obj ) {
-          param += encodeURIComponent(key) + '=' + encodeURIComponent(obj[key])
-           + '&';
+    return Object.entries(obj).map(([key, value]) => {
+      return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+    }).join('&');
 
-        }
-        return param.substring(0, param.length-1) ;
    },
   /**
    * ф-ция на вход получает строку в виде key1=value1&key2=value2.... и возваращет объект {key1: value1, key2: value2,.... }
    */
   queryToObject(query) {
     const arrParam = query.split('&');
-        let arrEl = [];
-        let res = {};
-        for ( let i = 0; i < arrParam.length; i++ ) {
-          arrEl = arrParam[i].split('=');
-          res[arrEl[0]] = decodeURIComponent(arrEl[1]);
-        }
-    
-        return res;
+    return arrParam.reduce((acc, current) => {
+      const [key, value] = current.split('=');
+      acc[decodeURIComponent(key)] = decodeURIComponent(value);
+      console.log(typeof(current));
+      return acc;
+    },{} ) 
   }
 };
