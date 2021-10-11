@@ -23,28 +23,95 @@ const U = {
 
   },
 
+   //
+  //
+  createHTMLElement(
+    tag,
+    options = {
+      text,
+      className,
+      data,
+      children,
+      attributes,
+      events,
+    }
+  ) {
+    const element = document.createElement(tag);
+
+    if (options.text) {
+      element.innerText = options.text;
+    }
+
+    if (options.className) {
+      element.className = options.className;
+    }
+
+    if (options.data) {
+      Object.entries(options.data).map(([key, value]) => {
+        element.setAttribute(`data-${key}`, value);
+      });
+    }
+
+    if (options.children) {
+      options.children.map((el) => {
+        const child = document.createElement(el);
+        element.append(child);
+      });
+    }
+
+    if (options.attributes) {
+      Object.entries(options.attributes).map(([key, value]) => {
+        element.setAttribute(`${key}`, value);
+      });
+    }
+
+    if (options.events) {
+      Object.entries(options.events).map(([key, value]) => {
+        element.addEventListener(key, value);
+      });
+    }
+
+    return element;
+  },
+
   confirm(msg) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       //надо показать диалог, сделать самому диалог, у которого есть 2 кнопки - ok/cancel
       //promise должен резолвится после нажатия кнопок со значением true/false
       // true - confirmed, false - not confirmed
-      let message = document.createElement('div');
-      message.innerText = msg;
-      document.body.append(message);
-      let buttonOk = document.createElement('button');
-      buttonOk.innerText = 'ok';
-      document.body.append(buttonOk);
-      let buttonCancel = document.createElement('button');
-      buttonCancel.innerText = 'cancel';
-      document.body.append(buttonCancel);
+      const confirmContainer = createHTMLElement("div", {
+        className: "confirm_container",
+      });
 
-      buttonOk.addEventListener('click', () => {
-        resolve(true);
-      })
-      buttonCancel.addEventListener('click', () => {
-        resolve(false);
-      })
+      const message = createHTMLElement("p", {
+        text: msg,
+        className: "message",
+      });
 
+      const buttonOk = createHTMLElement("button", {
+        text: "ok",
+        className: "btn_ok",
+        events: {
+          click: () => {
+            resolve(true);
+          },
+        },
+      });
+
+      const buttonCancel = createHTMLElement("button", {
+        text: "cancel",
+        className: "btn_cancel",
+        events: {
+          click: () => {
+            resolve(false);
+          },
+        },
+      });
+
+      document.body.append(confirmContainer);
+      confirmContainer.append(message);
+      confirmContainer.append(buttonOk);
+      confirmContainer.append(buttonCancel);
     });
   },
 
